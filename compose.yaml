@@ -1,0 +1,50 @@
+version: "3"
+services:
+  myserv:
+    build: .
+  gui:
+    build: ./vant-gui/
+    expose:
+      - 443
+    ports: 
+      - 443:443
+    depends_on:
+      - recorder
+    volumes:
+      - type: bind
+        source: logs/gui
+        target: /gui/logs
+  api:
+    build: ./vant-api/
+    expose: 
+      - 8000
+    ports:
+      - 8000:8000
+    volumes:
+      - type: bind
+        source: logs/api
+        target: /api/logs
+  recorder:
+    build: ./vant-recorder/
+    privileged: true
+    depends_on: 
+      - api
+    volumes:
+      - type: bind
+        source: logs/recorder
+        target: /recorder/logs
+      - type: bind
+        source: /dev
+        target: /dev
+      - type: bind
+        source: /run/udev
+        target: /run/udev:ro
+  mongodb:
+    image: mongo:4.4.18
+    command: mongod --quiet --logpath /dev/null
+    ports:
+      - 27017:27017
+    volumes:
+      - type: bind
+        source: ./data
+        target: /data/db

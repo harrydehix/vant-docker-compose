@@ -1,9 +1,8 @@
 version: "3"
 services:
-  myserv:
-    build: .
   gui:
     build: ./vant-gui/
+    restart: always
     expose:
       - 443
     ports: 
@@ -16,6 +15,7 @@ services:
         target: /gui/logs
   api:
     build: ./vant-api/
+    restart: always
     expose: 
       - 8000
     ports:
@@ -26,6 +26,7 @@ services:
         target: /api/logs
   recorder:
     build: ./vant-recorder/
+    restart: always
     privileged: true
     depends_on: 
       - api
@@ -41,6 +42,7 @@ services:
         target: /run/udev:ro
   mongodb:
     image: mongo:4.4.18
+    restart: always
     command: mongod --quiet --logpath /dev/null
     ports:
       - 27017:27017
